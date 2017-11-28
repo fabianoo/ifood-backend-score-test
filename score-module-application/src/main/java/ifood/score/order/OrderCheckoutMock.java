@@ -23,7 +23,8 @@ public class OrderCheckoutMock {
 	
 	private static OrderPicker picker = new OrderPicker();
 	
-	@Scheduled(fixedRate=3*1000)
+//	@Scheduled(fixedRate=3*1000)
+//	@Scheduled(fixedRate=3*10)
 	public void checkoutFakeOrder(){
 		IntStream.rangeClosed(1, _int(2, 12)).forEach(t -> {
 			Order order = picker.pick();
@@ -34,7 +35,7 @@ public class OrderCheckoutMock {
 		});
 	}
 	
-	@Scheduled(fixedRate=30*1000)
+//	@Scheduled(fixedRate=30*10)
 	public void cancelFakeOrder(){
 		IntStream.range(1, _int(2, cancellantionQueue.size() > 2 ? cancellantionQueue.size() : 2)).forEach(t ->{
 			UUID orderUuid = cancellantionQueue.poll();
