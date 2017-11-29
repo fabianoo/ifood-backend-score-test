@@ -1,4 +1,4 @@
-# iFood Backend Test - Score
+# Score Computing Example
 
 Our goal is to be the best food marketplace in the world.
 
@@ -6,14 +6,32 @@ In order to build trust from our million users (restaurants and consumers), we n
 how relevant the menu item/categories sold by our partners are. 
 So, we can give insights to our restaurants and better offers to our consumers. 
 
-## Tasks
+## Rest API's
 
-Your task is to develop one (or more, feel free) RESTful service(s) to:
-* Provide Score for a given Menu Item
-* Provide Score for a given Category
-* Retrieve Menu Item with Score above/below a parameter
-* Retrieve Categories with Score above/below a parameter
-* Update score of Menu Item and Categories according to our business rules
+- Retrieve a Score for a given Menu Item:
+```
+/api/menu/{menu-id}/score
+```
+- Retrieve Score for a given Category:
+```
+/api/categories/{category-name}/score
+```
+
+- Retrieve Menu Item with Score above/below a parameter
+```
+/api/menu/score?min-score={min-score}&max-score={max-score}
+```
+- Retrieve Categories with Score above/below a parameter:
+```
+/api/categories/score?min-score={min-score}&max-score={max-score}
+```
+
+**Note**: the `min-score` and `max-score` query params are not mandatory as well as the pagination params.
+
+**Pagination Params:**
+
+- page: the page number starting from `1` (same value if not passed)
+- size: the page size, greater than `0` and limited to `100` (same value if not passed)
 
 We also would like you to check our module `score-order-generator` and give us a overview about our choices regarding:
 * Design Pattens

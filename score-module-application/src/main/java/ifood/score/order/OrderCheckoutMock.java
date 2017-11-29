@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -18,29 +19,35 @@ public class OrderCheckoutMock {
 
 	@Autowired
 	JmsTemplate jmsTemplate;
+
+	@Value("${score.order.checkout.queue-name}")
+	private String checkoutOrderQueue;
+
+	@Value("${score.order.cancel.queue-name}")
+	private String cancelOrderQueue;
 	
 	ConcurrentLinkedQueue<UUID> cancellantionQueue = new ConcurrentLinkedQueue<>();
 	
 	private static OrderPicker picker = new OrderPicker();
-	
-//	@Scheduled(fixedRate=3*1000)
-//	@Scheduled(fixedRate=3*10)
+
+	//	@Scheduled(fixedRate=3*1000)
+	@Scheduled(fixedRate=3*10)
 	public void checkoutFakeOrder(){
 		IntStream.rangeClosed(1, _int(2, 12)).forEach(t -> {
 			Order order = picker.pick();
 			if(_int(0, 20) % 20 == 0){
 				cancellantionQueue.add(order.getUuid());
 			}
-			jmsTemplate.convertAndSend("checkout-order", order);
+			jmsTemplate.convertAndSend(checkoutOrderQueue, order);
 		});
 	}
 	
-//	@Scheduled(fixedRate=30*10)
+	@Scheduled(fixedRate=30*10)
 	public void cancelFakeOrder(){
 		IntStream.range(1, _int(2, cancellantionQueue.size() > 2 ? cancellantionQueue.size() : 2)).forEach(t ->{
 			UUID orderUuid = cancellantionQueue.poll();
 			if(orderUuid != null){
-				jmsTemplate.convertAndSend("cancel-order", orderUuid);
+				jmsTemplate.convertAndSend(cancelOrderQueue, orderUuid);
 			}
 		});
 	}

@@ -1,6 +1,6 @@
 package ifood.score.service;
 
-import ifood.score.domain.entity.OrderCategoryRelevance;
+import ifood.score.domain.entity.Relevance;
 import ifood.score.menu.Category;
 import ifood.score.order.Item;
 import ifood.score.order.Order;
@@ -13,10 +13,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class OrderRelevanceComputerTest {
+public class RelevanceComputerTest {
 
     @Test
-    public void testCalculateScore() {
+    public void testCalculateRelevance() {
         Order order = new Order();
         order.setUuid(UUID.randomUUID());
         order.setAddressUuid(UUID.randomUUID());
@@ -32,10 +32,10 @@ public class OrderRelevanceComputerTest {
 
         order.setItems(Arrays.asList(item));
 
-        OrderRelevanceComputer processor = new OrderRelevanceComputer(order);
-        List<OrderCategoryRelevance> orderCategoryRelevances = processor.categoryRelevances();
+        RelevanceComputer processor = new RelevanceComputer(order);
+        List<Relevance> relevances = processor.relevances();
 
-        Assert.assertEquals(1, orderCategoryRelevances.size());
-        Assert.assertEquals(BigDecimal.valueOf(100).setScale(1), orderCategoryRelevances.get(0).getValue().setScale(1));
+        Assert.assertEquals(1, relevances.size());
+        Assert.assertEquals(BigDecimal.valueOf(100).setScale(1), relevances.get(0).getValue().setScale(1));
     }
 }

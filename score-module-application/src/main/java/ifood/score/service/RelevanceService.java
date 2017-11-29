@@ -2,10 +2,8 @@ package ifood.score.service;
 
 import com.mongodb.Block;
 import com.mongodb.MongoClient;
-import ifood.score.domain.entity.OrderCategoryRelevance;
-import ifood.score.domain.entity.OrderMenuRelevance;
-import ifood.score.domain.repository.CategoryScoreRepository;
-import ifood.score.domain.repository.MenuScoreRepository;
+import ifood.score.domain.entity.Relevance;
+import ifood.score.domain.repository.RelevanceRepository;
 import ifood.score.menu.Category;
 import ifood.score.order.Order;
 import org.bson.Document;
@@ -21,13 +19,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class OrderRelevanceService {
+public class RelevanceService {
 
     @Autowired
-    private MenuScoreRepository menuScoreRepository;
-
-    @Autowired
-    private CategoryScoreRepository categoryScoreRepository;
+    private RelevanceRepository relevanceRepository;
 
     @Autowired
     private MongoClient mongoClient;
@@ -35,23 +30,16 @@ public class OrderRelevanceService {
     @Autowired
     private JmsTemplate jmsTemplate;
 
-    @Value("")
-    private String menuRelevanceQeue;
-
-    @Value("")
-    private String categoryRelevanceQeue;
+    @Value("${score.relevance.queue-name}")
+    private String relevanceQueue;
 
     public void processOrderCheckout(Order order) {
-        OrderRelevanceComputer processor = new OrderRelevanceComputer(order);
+        RelevanceComputer computer = new RelevanceComputer(order);
 
-        List<OrderMenuRelevance> menuRelevances = processor.menuRelevances();
-        menuScoreRepository.saveAll(menuRelevances);
+        List<Relevance> relevances = computer.relevances();
+        relevanceRepository.saveAll(relevances);
 
-        List<OrderCategoryRelevance> categoryRelevances = processor.categoryRelevances();
-        categoryScoreRepository.saveAll(categoryRelevances);
-
-        menuRelevances.forEach(r -> jmsTemplate.convertAndSend(menuRelevanceQeue, r.getId()));
-        categoryRelevances.forEach(r -> jmsTemplate.convertAndSend(categoryRelevanceQeue, r.getId()));
+        relevances.forEach(r -> jmsTemplate.convertAndSend(relevanceQueue, r.getId()));
     }
 
     @Deprecated
