@@ -1,7 +1,7 @@
 package ifood.score.jms;
 
 import ifood.score.order.Order;
-import ifood.score.service.OrderScoreService;
+import ifood.score.service.OrderRelevanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 public class OrderListener {
 
     @Autowired
-    private OrderScoreService orderScoreService;
+    private OrderRelevanceService orderRelevanceService;
 
     @JmsListener(destination = "checkout-order", concurrency = "1-100")
     public void receiveCheckoutOrderMessage(Order order) {
         System.out.println("Receiving Checkout Order: " + order);
 
-        orderScoreService.processOrderCheckout(order);
+        orderRelevanceService.processOrderCheckout(order);
 
     }
 

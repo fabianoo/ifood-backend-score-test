@@ -16,16 +16,8 @@ import java.util.UUID;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class MenuScore {
-
-    @Indexed
-    private UUID orderId;
+public class OrderMenuRelevance extends OrderRelevance {
 
     @Indexed
     private UUID menuId;
-
-    @Indexed
-    private Date confirmedAt;
-
-    private BigDecimal score;
 }

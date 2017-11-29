@@ -1,7 +1,7 @@
 package ifood.score.web;
 
 import ifood.score.menu.Category;
-import ifood.score.service.OrderScoreService;
+import ifood.score.service.OrderRelevanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 public class ScoreRestApi {
 
     @Autowired
-    private OrderScoreService service;
+    private OrderRelevanceService service;
 
     @RequestMapping("/category/{category}")
     public BigDecimal categoryScoreMean(@PathVariable("category") String category) throws IOException {

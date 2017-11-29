@@ -1,7 +1,7 @@
 package ifood.score.service;
 
-import ifood.score.domain.entity.CategoryScore;
-import ifood.score.domain.entity.MenuScore;
+import ifood.score.domain.entity.OrderCategoryRelevance;
+import ifood.score.domain.entity.OrderMenuRelevance;
 import ifood.score.menu.Category;
 import ifood.score.order.Item;
 import ifood.score.order.Order;
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class OrderProcessor {
+class OrderRelevanceComputer {
 
     private final Order order;
     private final Integer itemsTotalQty;
@@ -20,7 +20,7 @@ public class OrderProcessor {
     private final Map<UUID, List<Item>> menuMap;
     private final Map<Category, List<Item>> categMap;
 
-    OrderProcessor(Order order) {
+    OrderRelevanceComputer(Order order) {
         this.order = order;
         List<Item> allItems = order.getItems();
         this.itemsTotalQty = allItems.stream().mapToInt(Item::getQuantity).sum();
@@ -31,47 +31,49 @@ public class OrderProcessor {
         this.categMap = allItems.stream().collect(Collectors.groupingBy(Item::getMenuCategory));
     }
 
-    List<MenuScore> menuScores() {
+    List<OrderMenuRelevance> menuRelevances() {
         return menuMap.keySet().stream().map(m -> {
             List<Item> items = menuMap.get(m);
-            BigDecimal score = calculateScore(items);
+            BigDecimal score = computeRelevance(items);
 
-            MenuScore menuScore = new MenuScore();
-            menuScore.setScore(score);
-            menuScore.setMenuId(m);
-            menuScore.setConfirmedAt(order.getConfirmedAt());
-            menuScore.setOrderId(order.getUuid());
+            OrderMenuRelevance orderMenuRelevance = new OrderMenuRelevance();
+            orderMenuRelevance.setValue(score);
+            orderMenuRelevance.setMenuId(m);
+            orderMenuRelevance.setConfirmedAt(order.getConfirmedAt());
+            orderMenuRelevance.setOrderId(order.getUuid());
 
-            return menuScore;
+            return orderMenuRelevance;
         }).collect(Collectors.toList());
     }
 
-    List<CategoryScore> categoryScores() {
+    List<OrderCategoryRelevance> categoryRelevances() {
         return categMap.keySet().stream().map(c -> {
             List<Item> items = categMap.get(c);
-            BigDecimal score = calculateScore(items);
+            BigDecimal score = computeRelevance(items);
 
-            CategoryScore categoryScore = new CategoryScore();
-            categoryScore.setScore(score);
-            categoryScore.setCategory(c);
-            categoryScore.setConfirmedAt(order.getConfirmedAt());
-            categoryScore.setOrderId(order.getUuid());
+            OrderCategoryRelevance orderCategoryRelevance = new OrderCategoryRelevance();
+            orderCategoryRelevance.setValue(score);
+            orderCategoryRelevance.setCategory(c);
+            orderCategoryRelevance.setConfirmedAt(order.getConfirmedAt());
+            orderCategoryRelevance.setOrderId(order.getUuid());
 
-            return categoryScore;
+            return orderCategoryRelevance;
         }).collect(Collectors.toList());
     }
 
-    private BigDecimal calculateScore(List<Item> items) {
+    private BigDecimal computeRelevance(List<Item> items) {
         Integer menuQty = items.stream().mapToInt(Item::getQuantity).sum();
         BigDecimal menuPrice = items.stream()
                 .map(i -> i.getMenuUnitPrice().multiply(new BigDecimal(i.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         BigDecimal qtyIndex = quantityIndex(itemsTotalQty, menuQty);
         BigDecimal priceIndex = priceIndex(totalPrice, menuPrice);
-        return calculateRelevance(qtyIndex, priceIndex);
+
+        return relevance(qtyIndex, priceIndex);
     }
 
-    private BigDecimal calculateRelevance(BigDecimal qtyIndex, BigDecimal priceIndex) {
+    private BigDecimal relevance(BigDecimal qtyIndex, BigDecimal priceIndex) {
         BigDecimal total = qtyIndex.multiply(priceIndex).multiply(BigDecimal.valueOf(10000));
         double doubleValue = Math.sqrt(total.doubleValue());
         return BigDecimal.valueOf(doubleValue);

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class OrderScoreService {
+public class OrderRelevanceService {
 
     @Autowired
     private MenuScoreRepository menuScoreRepository;
@@ -29,11 +29,12 @@ public class OrderScoreService {
     private MongoClient mongoClient;
 
     public void processOrderCheckout(Order order) {
-        OrderProcessor processor = new OrderProcessor(order);
-        menuScoreRepository.saveAll(processor.menuScores());
-        categoryScoreRepository.saveAll(processor.categoryScores());
+        OrderRelevanceComputer processor = new OrderRelevanceComputer(order);
+        menuScoreRepository.saveAll(processor.menuRelevances());
+        categoryScoreRepository.saveAll(processor.categoryRelevances());
     }
 
+    @Deprecated
     public BigDecimal retrieveCategoryScoreMean(Category category) {
         List<BigDecimal> allScores = new ArrayList<>();
         Bson bson = Document.parse(String.format("{category: '%s'}", category.toString()));
