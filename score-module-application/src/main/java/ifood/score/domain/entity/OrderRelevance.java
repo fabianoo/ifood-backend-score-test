@@ -1,6 +1,7 @@
 package ifood.score.domain.entity;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigDecimal;
@@ -9,6 +10,9 @@ import java.util.UUID;
 
 @Data
 public abstract class OrderRelevance {
+
+    @Id
+    private UUID id;
 
     @Indexed
     private UUID orderId;

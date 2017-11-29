@@ -17,7 +17,6 @@ public class OrderListener {
         System.out.println("Receiving Checkout Order: " + order);
 
         orderRelevanceService.processOrderCheckout(order);
-
     }
 
     @JmsListener(destination = "cancel-order")
