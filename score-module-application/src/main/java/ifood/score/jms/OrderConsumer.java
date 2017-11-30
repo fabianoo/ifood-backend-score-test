@@ -7,7 +7,7 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OrderListener {
+public class OrderConsumer {
 
     @Autowired
     private RelevanceService relevanceService;

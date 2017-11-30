@@ -3,6 +3,7 @@ package ifood.score.service;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import ifood.score.domain.entity.Relevance;
+import ifood.score.domain.entity.RelevanceStatus;
 import ifood.score.menu.Category;
 import ifood.score.order.Item;
 import ifood.score.order.Order;
@@ -72,6 +73,7 @@ class RelevanceComputer {
     private void fillWithOrderData(Relevance relevance) {
         relevance.setConfirmedAt(order.getConfirmedAt());
         relevance.setOrderId(order.getUuid());
+        relevance.setStatus(RelevanceStatus.NOT_COMPUTED);
     }
 
     private BigDecimal computeRelevance(List<Item> items) {
