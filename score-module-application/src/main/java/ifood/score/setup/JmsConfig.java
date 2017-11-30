@@ -1,4 +1,4 @@
-package ifood.score;
+package ifood.score.setup;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
