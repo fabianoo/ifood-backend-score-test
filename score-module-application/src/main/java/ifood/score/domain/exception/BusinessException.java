@@ -3,7 +3,7 @@ package ifood.score.domain.exception;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-class BusinessException extends RuntimeException {
+abstract class BusinessException extends RuntimeException {
 
     BusinessException(String message) {
         super(message);

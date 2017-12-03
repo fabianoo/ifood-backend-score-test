@@ -20,8 +20,11 @@ public abstract class Score {
     }
 
     public void cancelRelevance(Relevance relevance)  {
-        BigDecimal amount = this.mean.multiply(BigDecimal.valueOf(weight));
-        weight--;
-        this.mean = amount.subtract(relevance.getValue()).divide(BigDecimal.valueOf(weight), BigDecimal.ROUND_HALF_UP);
+        BigDecimal amount = this.mean.multiply(BigDecimal.valueOf(weight));;
+        if(--weight > 0) {
+            this.mean = amount.subtract(relevance.getValue()).divide(BigDecimal.valueOf(weight), BigDecimal.ROUND_HALF_UP);
+        } else {
+            this.mean = BigDecimal.ZERO;
+        }
     }
 }

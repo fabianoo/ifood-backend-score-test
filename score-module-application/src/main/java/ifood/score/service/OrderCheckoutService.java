@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class RelevanceService {
+public class OrderCheckoutService {
 
     @Autowired
     private RelevanceRepository relevanceRepository;

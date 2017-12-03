@@ -1,6 +1,7 @@
 package ifood.score.setup;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.RedeliveryPolicy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,13 +14,14 @@ public class JmsConfig {
     @Value("${spring.activemq.broker-url}")
     private String brokerUrl;
 
-    private ActiveMQConnectionFactory activeMQConnectionFactory() {
-        ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
-        activeMQConnectionFactory.setBrokerURL(brokerUrl);
-        activeMQConnectionFactory.setTrustAllPackages(true);
+    @Value("${spring.activemq.user}")
+    private String brokerUser;
 
-        return activeMQConnectionFactory;
-    }
+    @Value("${spring.activemq.password}")
+    private String brokerPassword;
+
+    @Value("${spring.activemq.packages.trust-all}")
+    private Boolean trustAllPackages;
 
     @Bean
     public CachingConnectionFactory cachingConnectionFactory() {
@@ -29,5 +31,26 @@ public class JmsConfig {
     @Bean
     public JmsTemplate jmsTemplate() {
         return new JmsTemplate(cachingConnectionFactory());
+    }
+
+    private ActiveMQConnectionFactory activeMQConnectionFactory() {
+        ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
+        activeMQConnectionFactory.setBrokerURL(brokerUrl);
+        activeMQConnectionFactory.setUserName(brokerUser);
+        activeMQConnectionFactory.setPassword(brokerPassword);
+        activeMQConnectionFactory.setTrustAllPackages(trustAllPackages);
+        activeMQConnectionFactory.setRedeliveryPolicy(redeliveryPolicy());
+        activeMQConnectionFactory.setNonBlockingRedelivery(true);
+
+        return activeMQConnectionFactory;
+    }
+
+    private RedeliveryPolicy redeliveryPolicy() {
+        RedeliveryPolicy policy = new RedeliveryPolicy();
+        policy.setRedeliveryDelay(10 * 1000);
+        policy.setUseExponentialBackOff(true);
+        policy.setMaximumRedeliveries(15);
+
+        return policy;
     }
 }

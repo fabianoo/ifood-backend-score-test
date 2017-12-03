@@ -1,7 +1,5 @@
 package ifood.score.service;
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import ifood.score.domain.entity.Relevance;
 import ifood.score.domain.entity.RelevanceStatus;
 import ifood.score.menu.Category;
@@ -9,7 +7,6 @@ import ifood.score.order.Item;
 import ifood.score.order.Order;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;

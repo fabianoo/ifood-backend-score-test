@@ -15,4 +15,7 @@ import java.util.UUID;
 public interface MenuScoreRepository extends MongoRepository<MenuScore, UUID> {
 
     Page<MenuScore> findByMeanBetweenOrderByMeanAsc(BigDecimal min, BigDecimal max, Pageable pageable);
+
+    @Override
+    List<MenuScore> findAllById(Iterable<UUID> uuids);
 }
