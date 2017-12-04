@@ -19,6 +19,7 @@ public class RelevanceComputer {
     private final BigDecimal totalPrice;
     private final Map<UUID, List<Item>> menuMap;
     private final Map<Category, List<Item>> categMap;
+    private Relevance relevance = new Relevance();
 
     public RelevanceComputer(Order order) {
         this.order = order;
@@ -29,51 +30,35 @@ public class RelevanceComputer {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         this.menuMap = allItems.stream().collect(Collectors.groupingBy(Item::getMenuUuid));
         this.categMap = allItems.stream().collect(Collectors.groupingBy(Item::getMenuCategory));
+
+        this.relevance.setConfirmedAt(order.getConfirmedAt());
+        this.relevance.setOrderId(order.getUuid());
+        this.relevance.setStatus(RelevanceStatus.NOT_COMPUTED);
     }
 
-    public List<Relevance> relevances() {
-        List<Relevance> relevances = menuRelevances();
-        relevances.addAll(categoryRelevances());
-        return relevances;
+    public Relevance computeRelevance() {
+        computeMenuItems();
+        computeCategoryItems();
+        return relevance;
     }
 
-    private List<Relevance> menuRelevances() {
-        return menuMap.keySet().stream().map(m -> {
+    private void computeMenuItems() {
+        menuMap.keySet().forEach(m -> {
             List<Item> items = menuMap.get(m);
-            BigDecimal score = computeRelevance(items);
-
-            Relevance relevance = new Relevance();
-            relevance.setValue(score);
-            relevance.setMenuId(m);
-
-            fillWithOrderData(relevance);
-
-            return relevance;
-        }).collect(Collectors.toList());
+            BigDecimal scoreItem = computeRelevanceValue(items);
+            this.relevance.addItem(m, scoreItem);
+        });
     }
 
-    private List<Relevance> categoryRelevances() {
-        return categMap.keySet().stream().map(c -> {
+    private void computeCategoryItems() {
+        categMap.keySet().forEach(c -> {
             List<Item> items = categMap.get(c);
-            BigDecimal score = computeRelevance(items);
-
-            Relevance relevance = new Relevance();
-            relevance.setValue(score);
-            relevance.setCategory(c);
-
-            fillWithOrderData(relevance);
-
-            return relevance;
-        }).collect(Collectors.toList());
+            BigDecimal scoreItem = computeRelevanceValue(items);
+            this.relevance.addItem(c, scoreItem);
+        });
     }
 
-    private void fillWithOrderData(Relevance relevance) {
-        relevance.setConfirmedAt(order.getConfirmedAt());
-        relevance.setOrderId(order.getUuid());
-        relevance.setStatus(RelevanceStatus.NOT_COMPUTED);
-    }
-
-    private BigDecimal computeRelevance(List<Item> items) {
+    private BigDecimal computeRelevanceValue(List<Item> items) {
         Integer menuQty = items.stream().mapToInt(Item::getQuantity).sum();
         BigDecimal menuPrice = items.stream()
                 .map(i -> i.getMenuUnitPrice().multiply(new BigDecimal(i.getQuantity())))

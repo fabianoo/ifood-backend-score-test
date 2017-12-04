@@ -24,8 +24,9 @@ public class RelevanceComputerTest {
         order.setRestaurantUuid(UUID.randomUUID());
         order.setConfirmedAt(new Date());
 
+        UUID menuUuid = UUID.randomUUID();
         Item item = new Item();
-        item.setMenuUuid(UUID.randomUUID());
+        item.setMenuUuid(menuUuid);
         item.setMenuCategory(Category.PIZZA);
         item.setMenuUnitPrice(new BigDecimal(50));
         item.setQuantity(2);
@@ -33,9 +34,12 @@ public class RelevanceComputerTest {
         order.setItems(Arrays.asList(item));
 
         RelevanceComputer processor = new RelevanceComputer(order);
-        List<Relevance> relevances = processor.relevances();
+        Relevance relevance = processor.computeRelevance();
 
-        Assert.assertEquals(1, relevances.size());
-        Assert.assertEquals(BigDecimal.valueOf(100).setScale(1), relevances.get(0).getValue().setScale(1));
+        Assert.assertEquals(2, relevance.getItems().size());
+        Assert.assertEquals(menuUuid, relevance.getItems().get(0).getMenuId());
+        Assert.assertEquals(Category.PIZZA, relevance.getItems().get(1).getCategory());
+        Assert.assertEquals(BigDecimal.valueOf(100).setScale(1), relevance.getItems().get(0).getValue().setScale(1));
+        Assert.assertEquals(BigDecimal.valueOf(100).setScale(1), relevance.getItems().get(1).getValue().setScale(1));
     }
 }

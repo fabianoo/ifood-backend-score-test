@@ -10,7 +10,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Document
@@ -21,21 +23,41 @@ import java.util.UUID;
 public class Relevance {
 
     @Id
-    private String id;
-
-    @Indexed
     private UUID orderId;
 
-    @Indexed
-    private Category category;
+    private RelevanceStatus status;
 
-    @Indexed
-    private UUID menuId;
-
-    @Indexed
     private Date confirmedAt;
 
-    private BigDecimal value;
+    private List<Item> items = new ArrayList<>();
 
-    private RelevanceStatus status;
+    public void addItem(Category category, BigDecimal value) {
+        items.add(new Item(category, value));
+    }
+
+    public void addItem(UUID menu, BigDecimal value) {
+        items.add(new Item(menu, value));
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class Item {
+        @Indexed
+        private Category category;
+
+        @Indexed
+        private UUID menuId;
+
+        private BigDecimal value;
+
+        public Item(Category category, BigDecimal value) {
+            this.category = category;
+            this.value = value;
+        }
+
+        public Item(UUID menuId, BigDecimal value) {
+            this.menuId = menuId;
+            this.value = value;
+        }
+    }
 }
