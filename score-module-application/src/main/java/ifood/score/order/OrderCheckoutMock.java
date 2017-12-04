@@ -1,9 +1,9 @@
 package ifood.score.order;
 
+import ifood.score.jms.JmsBridge;
 import ifood.score.mock.generator.order.OrderPicker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -23,29 +23,29 @@ public class OrderCheckoutMock {
 	private String cancelOrderQueue;
 
 	@Autowired
-	JmsTemplate jmsTemplate;
+	JmsBridge jmsBridge;
 	
 	private ConcurrentLinkedQueue<UUID> cancellantionQueue = new ConcurrentLinkedQueue<>();
 	
 	private static OrderPicker picker = new OrderPicker();
 
-	@Scheduled(fixedRate=3*10)
+	@Scheduled(fixedRate=3 * 1000)
 	public void checkoutFakeOrder(){
 		IntStream.rangeClosed(1, _int(2, 12)).forEach(t -> {
 			Order order = picker.pick();
 			if(_int(0, 20) % 20 == 0){
 				cancellantionQueue.add(order.getUuid());
 			}
-			jmsTemplate.convertAndSend(checkoutOrderQueue, order);
+			jmsBridge.sendMessage(checkoutOrderQueue, order);
 		});
 	}
 	
-	@Scheduled(fixedRate=30*10)
+	@Scheduled(fixedRate=30 * 1000)
 	public void cancelFakeOrder(){
 		IntStream.range(1, _int(2, cancellantionQueue.size() > 2 ? cancellantionQueue.size() : 2)).forEach(t ->{
 			UUID orderUuid = cancellantionQueue.poll();
 			if(orderUuid != null){
-				jmsTemplate.convertAndSend(cancelOrderQueue, orderUuid);
+				jmsBridge.sendMessage(cancelOrderQueue, orderUuid);
 			}
 		});
 	}

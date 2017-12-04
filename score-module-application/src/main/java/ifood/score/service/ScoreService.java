@@ -10,6 +10,8 @@ import ifood.score.menu.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.JmsException;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.management.JMException;
 import java.util.List;
@@ -58,7 +60,6 @@ public class ScoreService {
 
     public void computeRelevance(Relevance relevance) {
         Optional<? extends Score> optional = scoreByRelevance(relevance);
-
         Score score;
         if(optional.isPresent()) {
             score = optional.get();

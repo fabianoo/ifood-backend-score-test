@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-class RelevanceComputer {
+public class RelevanceComputer {
 
     private final Order order;
     private final Integer itemsTotalQty;
@@ -20,7 +20,7 @@ class RelevanceComputer {
     private final Map<UUID, List<Item>> menuMap;
     private final Map<Category, List<Item>> categMap;
 
-    RelevanceComputer(Order order) {
+    public RelevanceComputer(Order order) {
         this.order = order;
         List<Item> allItems = order.getItems();
         this.itemsTotalQty = allItems.stream().mapToInt(Item::getQuantity).sum();
@@ -31,7 +31,7 @@ class RelevanceComputer {
         this.categMap = allItems.stream().collect(Collectors.groupingBy(Item::getMenuCategory));
     }
 
-    List<Relevance> relevances() {
+    public List<Relevance> relevances() {
         List<Relevance> relevances = menuRelevances();
         relevances.addAll(categoryRelevances());
         return relevances;

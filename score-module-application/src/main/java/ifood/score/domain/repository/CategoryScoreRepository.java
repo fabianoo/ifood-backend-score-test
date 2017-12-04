@@ -12,7 +12,4 @@ import java.util.List;
 public interface CategoryScoreRepository extends MongoRepository<CategoryScore, Category> {
 
     List<CategoryScore> findByMeanBetweenOrderByMeanAsc(BigDecimal min, BigDecimal max);
-
-    @Override
-    List<CategoryScore> findAllById(Iterable<Category> categories);
 }

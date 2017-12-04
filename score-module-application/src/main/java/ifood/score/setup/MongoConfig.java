@@ -1,50 +1,38 @@
 package ifood.score.setup;
 
-import com.mongodb.MongoClient;
+import com.mongodb.reactivestreams.client.MongoClient;
+import com.mongodb.reactivestreams.client.MongoClients;
 import ifood.score.setup.converters.BigDecimalToDoubleConverter;
 import ifood.score.setup.converters.DoubleToBigDecimalConverter;
 import ifood.score.setup.converters.StringToUuidConverter;
 import ifood.score.setup.converters.UuidToStringConverter;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.CustomConversions;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Configuration
-public class MongoConfig {
+public class MongoConfig extends AbstractReactiveMongoConfiguration {
 
-    @Value("${spring.data.mongodb.host}")
-    private String mongoHost;
+//    @Value("${spring.data.mongodb.uri}")
+//    private String connUri;
 
-    @Value("${spring.data.mongodb.port}")
-    private int mongoPort;
-
-    @Value("${spring.data.mongodb.database}")
-    private String mongoDatabase;
-
-    @Bean
-    public MongoTemplate mongoTemplate() throws Exception {
-        MongoTemplate mongoTemplate = new MongoTemplate(mongo(), mongoDatabase);
-        MappingMongoConverter mongoMapping = (MappingMongoConverter) mongoTemplate.getConverter();
-        mongoMapping.setCustomConversions(customConversions());
-        mongoMapping.afterPropertiesSet();
-        return mongoTemplate;
-
+    @Override
+    protected String getDatabaseName() {
+        return "score";
     }
 
-    @Bean
-    public MongoClient mongo() throws Exception {
-        return new MongoClient(mongoHost, mongoPort);
+    @Override
+    public MongoClient reactiveMongoClient() {
+//        return MongoClients.create(connUri);
+        return MongoClients.create();
     }
 
-
-    private CustomConversions customConversions() {
+    @Override
+    public CustomConversions customConversions() {
         return new CustomConversions(CustomConversions.StoreConversions.NONE,
                 converters());
     }
