@@ -29,37 +29,44 @@ public class ScoreService {
     private RelevanceRepository relevanceRepository;
 
     public void cancelRelevancesFromOrderId(String orderId) throws ScoreAsyncComputingException {
-        Optional<Relevance> optional = relevanceRepository.findByOrderId(orderId);
+        Optional<Relevance> optional = relevanceRepository.findById(UUID.fromString(orderId));
 
         if(!optional.isPresent()) {
-            throw new ScoreAsyncComputingException(
-                    "Should not process cancellation. This order is not ready yeat. Retrying later.");
+            throw new ScoreAsyncComputingException(String.format(
+                    "Should not process cancellation. This Order(%s) is not ready yeat. Retrying later.",
+                    orderId));
         }
 
         Relevance relevance = optional.get();
 
         if(relevance.isComputed()) {
-            Map<UUID, List<Relevance.Item>> menuMap = relevance.getItems().stream()
-                    .filter(r -> r.getMenuId() != null)
-                    .collect(Collectors.groupingBy(Relevance.Item::getMenuId));
+            List<Relevance.Item> items = relevance.getItems();
 
-            menuScoreRepository.findAllById(menuMap.keySet()).forEach(s -> {
-                menuMap.get(s.getMenuId()).forEach(s::cancel);
-                menuScoreRepository.save(s);
-            });
-
-            Map<Category, List<Relevance.Item>> categMap = relevance.getItems().stream()
-                    .filter(r -> r.getCategory() != null)
-                    .collect(Collectors.groupingBy(Relevance.Item::getCategory));
-
-            categoryScoreRepository.findAllById(categMap.keySet()).forEach(s -> {
-                categMap.get(s.getCategory()).forEach(s::cancel);
-                categoryScoreRepository.save(s);
-            });
+            avoidItems(items);
 
             relevance.setStatus(RelevanceStatus.CANCELLED);
             relevanceRepository.save(relevance);
         }
+    }
+
+    public void avoidItems(List<Relevance.Item> items) {
+        Map<UUID, List<Relevance.Item>> menuMap = items.stream()
+                .filter(r -> r.getMenuId() != null)
+                .collect(Collectors.groupingBy(Relevance.Item::getMenuId));
+
+        menuScoreRepository.findAllById(menuMap.keySet()).forEach(s -> {
+            menuMap.get(s.getMenuId()).forEach(s::avoid);
+            menuScoreRepository.save(s);
+        });
+
+        Map<Category, List<Relevance.Item>> categMap = items.stream()
+                .filter(r -> r.getCategory() != null)
+                .collect(Collectors.groupingBy(Relevance.Item::getCategory));
+
+        categoryScoreRepository.findAllById(categMap.keySet()).forEach(s -> {
+            categMap.get(s.getCategory()).forEach(s::avoid);
+            categoryScoreRepository.save(s);
+        });
     }
 
     public void computeRelevance(Relevance.Item item) {

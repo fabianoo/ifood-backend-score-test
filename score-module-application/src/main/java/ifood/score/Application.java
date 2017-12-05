@@ -8,8 +8,10 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.reactive.config.EnableWebFlux;
 
 @SpringBootApplication
+@EnableWebFlux
 @ComponentScan
 @EnableJms
 @EnableAsync

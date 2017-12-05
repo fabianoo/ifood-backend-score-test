@@ -31,7 +31,7 @@ public class ScoreBuilder {
         validate();
 
         BigDecimal sum = relevanceItems.stream().map(Relevance.Item::getValue).reduce((v, acc) -> acc = acc.add(v)).get();
-        BigDecimal scoreVal = sum.divide(BigDecimal.valueOf(relevanceItems.size()), BigDecimal.ROUND_HALF_EVEN);
+        BigDecimal scoreVal = MathOperations.divide(sum, BigDecimal.valueOf(relevanceItems.size()));
 
         Score score;
         Category category = relevanceItems.get(0).getCategory();

@@ -17,9 +17,6 @@ import java.util.List;
 @Configuration
 public class MongoConfig extends AbstractReactiveMongoConfiguration {
 
-//    @Value("${spring.data.mongodb.uri}")
-//    private String connUri;
-
     @Override
     protected String getDatabaseName() {
         return "score";
@@ -27,7 +24,6 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
 
     @Override
     public MongoClient reactiveMongoClient() {
-//        return MongoClients.create(connUri);
         return MongoClients.create();
     }
 

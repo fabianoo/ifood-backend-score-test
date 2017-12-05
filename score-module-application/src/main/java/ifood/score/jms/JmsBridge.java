@@ -13,6 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Signal;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Component
 public class JmsBridge {
@@ -30,7 +31,13 @@ public class JmsBridge {
     private LocalDateTime lastTry = LocalDateTime.now();
 
     public void sendMessage(String destination, Object message) {
-        String textMessage = new Gson().toJson(message);
+        String textMessage;
+        if(message instanceof UUID) {
+            textMessage = message.toString();
+        } else {
+            textMessage = new Gson().toJson(message);
+        }
+
         if(healthy || lastTry.isBefore(aMinuteAgo())) {
             lastTry = LocalDateTime.now();
             try {

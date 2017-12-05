@@ -39,7 +39,7 @@ public class RelevanceComputerTest {
         Assert.assertEquals(2, relevance.getItems().size());
         Assert.assertEquals(menuUuid, relevance.getItems().get(0).getMenuId());
         Assert.assertEquals(Category.PIZZA, relevance.getItems().get(1).getCategory());
-        Assert.assertEquals(BigDecimal.valueOf(100).setScale(1), relevance.getItems().get(0).getValue().setScale(1));
-        Assert.assertEquals(BigDecimal.valueOf(100).setScale(1), relevance.getItems().get(1).getValue().setScale(1));
+        Assert.assertEquals(BigDecimal.valueOf(100).setScale(10), relevance.getItems().get(0).getValue().setScale(10));
+        Assert.assertEquals(BigDecimal.valueOf(100).setScale(10), relevance.getItems().get(1).getValue().setScale(10));
     }
 }

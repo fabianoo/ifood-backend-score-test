@@ -2,6 +2,7 @@ package ifood.score.service;
 
 import ifood.score.domain.entity.Relevance;
 import ifood.score.domain.entity.RelevanceStatus;
+import ifood.score.domain.utils.MathOperations;
 import ifood.score.menu.Category;
 import ifood.score.order.Item;
 import ifood.score.order.Order;
@@ -70,16 +71,15 @@ public class RelevanceComputer {
     }
 
     private BigDecimal relevance(BigDecimal qtyIndex, BigDecimal priceIndex) {
-        BigDecimal total = qtyIndex.multiply(priceIndex).multiply(BigDecimal.valueOf(10000));
-        double doubleValue = Math.sqrt(total.doubleValue());
-        return BigDecimal.valueOf(doubleValue);
+        BigDecimal total = qtyIndex.multiply(priceIndex).multiply(BigDecimal.valueOf(10_000));
+        return MathOperations.sqrt(total);
     }
 
     private BigDecimal quantityIndex(Integer allItemsQty, Integer itemsQty) {
-        return BigDecimal.valueOf(itemsQty).divide(BigDecimal.valueOf(allItemsQty), BigDecimal.ROUND_HALF_EVEN);
+        return MathOperations.divide(BigDecimal.valueOf(itemsQty), BigDecimal.valueOf(allItemsQty));
     }
 
     private BigDecimal priceIndex(BigDecimal totalOrder, BigDecimal totalMenu)  {
-        return totalMenu.divide(totalOrder, BigDecimal.ROUND_HALF_EVEN);
+        return MathOperations.divide(totalMenu, totalOrder);
     }
 }

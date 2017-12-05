@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Component
+//@Component
 public class AsyncRelevanceReduceChecker {
 
     @Autowired

@@ -39,7 +39,7 @@ public class OrderConsumer {
         relevanceRepository.save(relevance);
     }
 
-//    @JmsListener(destination = "${score.order.cancel.queue-name}", concurrency = "1-10")
+    @JmsListener(destination = "${score.order.cancel.queue-name}", concurrency = "1-10")
     public void receiveCancelOrderMessage(String uuid) {
         logger.info("Receiving Cancel Order: " + uuid);
         scoreService.cancelRelevancesFromOrderId(uuid);
