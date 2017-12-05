@@ -33,7 +33,6 @@ public class RelevanceComputer {
 
         this.relevance.setConfirmedAt(order.getConfirmedAt());
         this.relevance.setOrderId(order.getUuid());
-        this.relevance.setStatus(RelevanceStatus.NOT_COMPUTED);
     }
 
     public Relevance computeRelevance() {
@@ -77,10 +76,10 @@ public class RelevanceComputer {
     }
 
     private BigDecimal quantityIndex(Integer allItemsQty, Integer itemsQty) {
-        return BigDecimal.valueOf(itemsQty).divide(BigDecimal.valueOf(allItemsQty), BigDecimal.ROUND_HALF_UP);
+        return BigDecimal.valueOf(itemsQty).divide(BigDecimal.valueOf(allItemsQty), BigDecimal.ROUND_HALF_EVEN);
     }
 
     private BigDecimal priceIndex(BigDecimal totalOrder, BigDecimal totalMenu)  {
-        return totalMenu.divide(totalOrder, BigDecimal.ROUND_HALF_UP);
+        return totalMenu.divide(totalOrder, BigDecimal.ROUND_HALF_EVEN);
     }
 }

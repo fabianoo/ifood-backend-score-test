@@ -35,7 +35,7 @@ public class OrderConsumer {
 
         relevance.getItems().forEach(r -> scoreService.computeRelevance(r));
 
-        relevance.setStatus(RelevanceStatus.NOT_COMPUTED);
+        relevance.setStatus(RelevanceStatus.COMPUTED);
         relevanceRepository.save(relevance);
     }
 

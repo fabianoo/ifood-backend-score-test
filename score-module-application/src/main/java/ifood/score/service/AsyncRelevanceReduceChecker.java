@@ -23,7 +23,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
-public class AsyncRelevanceReduceTest {
+public class AsyncRelevanceReduceChecker {
 
     @Autowired
     private RelevanceRepository relevanceRepository;

@@ -39,6 +39,10 @@ public class Relevance {
         items.add(new Item(menu, value));
     }
 
+    public Boolean isComputed() {
+        return this.status != null && this.status.equals(RelevanceStatus.COMPUTED);
+    }
+
     @Data
     @NoArgsConstructor
     public static class Item {
