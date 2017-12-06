@@ -45,6 +45,7 @@ public class Relevance {
 
     @Data
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class Item {
         @Indexed
         private Category category;

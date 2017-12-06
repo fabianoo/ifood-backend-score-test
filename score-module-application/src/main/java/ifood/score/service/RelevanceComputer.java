@@ -27,7 +27,7 @@ public class RelevanceComputer {
         List<Item> allItems = order.getItems();
         this.itemsTotalQty = allItems.stream().mapToInt(Item::getQuantity).sum();
         this.totalPrice = allItems.stream()
-                .map(i -> i.getMenuUnitPrice().multiply(new BigDecimal(i.getQuantity())))
+                .map(i -> MathOperations.multiply(i.getMenuUnitPrice(), i.getQuantity()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         this.menuMap = allItems.stream().collect(Collectors.groupingBy(Item::getMenuUuid));
         this.categMap = allItems.stream().collect(Collectors.groupingBy(Item::getMenuCategory));
@@ -61,7 +61,7 @@ public class RelevanceComputer {
     private BigDecimal computeRelevanceValue(List<Item> items) {
         Integer menuQty = items.stream().mapToInt(Item::getQuantity).sum();
         BigDecimal menuPrice = items.stream()
-                .map(i -> i.getMenuUnitPrice().multiply(new BigDecimal(i.getQuantity())))
+                .map(i -> MathOperations.multiply(i.getMenuUnitPrice(), i.getQuantity()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal qtyIndex = quantityIndex(itemsTotalQty, menuQty);
@@ -71,12 +71,12 @@ public class RelevanceComputer {
     }
 
     private BigDecimal relevance(BigDecimal qtyIndex, BigDecimal priceIndex) {
-        BigDecimal total = qtyIndex.multiply(priceIndex).multiply(BigDecimal.valueOf(10_000));
+        BigDecimal total = MathOperations.multiply(10_000, qtyIndex, priceIndex);
         return MathOperations.sqrt(total);
     }
 
     private BigDecimal quantityIndex(Integer allItemsQty, Integer itemsQty) {
-        return MathOperations.divide(BigDecimal.valueOf(itemsQty), BigDecimal.valueOf(allItemsQty));
+        return MathOperations.divide(itemsQty, allItemsQty);
     }
 
     private BigDecimal priceIndex(BigDecimal totalOrder, BigDecimal totalMenu)  {

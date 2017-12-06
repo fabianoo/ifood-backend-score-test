@@ -1,6 +1,7 @@
 package ifood.score.service;
 
 import ifood.score.domain.entity.Relevance;
+import ifood.score.domain.utils.MathOperations;
 import ifood.score.menu.Category;
 import ifood.score.order.Item;
 import ifood.score.order.Order;
@@ -28,7 +29,7 @@ public class RelevanceComputerTest {
         Item item = new Item();
         item.setMenuUuid(menuUuid);
         item.setMenuCategory(Category.PIZZA);
-        item.setMenuUnitPrice(new BigDecimal(50));
+        item.setMenuUnitPrice(MathOperations.asBigDecimal(50));
         item.setQuantity(2);
 
         order.setItems(Arrays.asList(item));
@@ -39,7 +40,7 @@ public class RelevanceComputerTest {
         Assert.assertEquals(2, relevance.getItems().size());
         Assert.assertEquals(menuUuid, relevance.getItems().get(0).getMenuId());
         Assert.assertEquals(Category.PIZZA, relevance.getItems().get(1).getCategory());
-        Assert.assertEquals(BigDecimal.valueOf(100).setScale(10), relevance.getItems().get(0).getValue().setScale(10));
-        Assert.assertEquals(BigDecimal.valueOf(100).setScale(10), relevance.getItems().get(1).getValue().setScale(10));
+        Assert.assertEquals(MathOperations.asBigDecimal(100), relevance.getItems().get(0).getValue());
+        Assert.assertEquals(MathOperations.asBigDecimal(100), relevance.getItems().get(1).getValue());
     }
 }

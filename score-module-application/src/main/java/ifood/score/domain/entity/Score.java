@@ -15,18 +15,22 @@ public abstract class Score {
     private Integer weight;
 
     public void compute(Relevance.Item item) {
-        BigDecimal amount = this.mean.multiply(BigDecimal.valueOf(weight));
+        BigDecimal amount = amount();
         weight++;
-        this.mean = MathOperations.divide(amount.add(item.getValue()), BigDecimal.valueOf(weight));
+        this.mean = MathOperations.divide(amount.add(item.getValue()), weight);
     }
 
     public void avoid(Relevance.Item item)  {
-        BigDecimal amount = this.mean.multiply(BigDecimal.valueOf(weight));
+        BigDecimal amount = amount();
         if(--weight > 0) {
-            this.mean = MathOperations.divide(amount.subtract(item.getValue()), BigDecimal.valueOf(weight));
+            this.mean = MathOperations.divide(amount.subtract(item.getValue()), weight);
         } else {
             this.mean = BigDecimal.ZERO;
             this.weight = 0;
         }
+    }
+
+    private BigDecimal amount() {
+        return MathOperations.multiply(this.mean, weight);
     }
 }
