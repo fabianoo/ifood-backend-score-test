@@ -1,0 +1,46 @@
+web:
+  image: nginx
+  volumes:
+   - ./infra/nginx.conf:/etc/nginx/conf.d/mysite.conf
+  ports:
+   - 80:80
+  links:
+    - application
+  environment:
+   - NGINX_HOST=ifood.fabiano.pro
+   - NGINX_PORT=80
+  command: /bin/bash -c "cat /etc/nginx/conf.d/mysite.conf | echo > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+mongodb:
+  image: mongo:latest
+  hostname: mongodb
+  environment:
+    - MONGO_DATA_DIR=/data/db
+    - MONGO_LOG_DIR=/dev/null
+  volumes:
+    - /container_data/mongo:/data/db
+  ports:
+      - 27017:27017
+  command: mongod --smallfiles --logpath=/dev/null
+activemq:
+  image: webcenter/activemq:latest
+  ports:
+    - 8161:8161
+    - 61616:61616
+    - 61613:61613
+  environment:
+    ACTIVEMQ_NAME: ActiveMQ
+    ACTIVEMQ_REMOVE_DEFAULT_ACCOUNT: 'True'
+    ACTIVEMQ_ADMIN_LOGIN: admin
+    ACTIVEMQ_ADMIN_PASSWORD: admin
+  volumes:
+    - /container_data/activemq/data:/data/activemq
+    - /container_data/activemq/log:/var/log/activemq
+application:
+  build: score-module-application
+  ports:
+    - 8080:8080
+  links:
+    - activemq
+    - mongodb
+  volumes:
+    - /container_data/webapp.log:/application.log

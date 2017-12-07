@@ -4,7 +4,9 @@ import ifood.score.jms.JmsBridge;
 import ifood.score.mock.generator.order.OrderPicker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -13,7 +15,8 @@ import java.util.stream.IntStream;
 
 import static ifood.score.mock.generator.RandomishPicker._int;
 
-@Service
+@Component
+@Profile("!benchmarking")
 public class OrderCheckoutMock {
 
 	@Value("${score.order.checkout.queue-name}")
@@ -23,13 +26,13 @@ public class OrderCheckoutMock {
 	private String cancelOrderQueue;
 
 	@Autowired
-	JmsBridge jmsBridge;
+	private JmsBridge jmsBridge;
 	
 	private ConcurrentLinkedQueue<UUID> cancellantionQueue = new ConcurrentLinkedQueue<>();
 	
 	private static OrderPicker picker = new OrderPicker();
 
-	@Scheduled(fixedRate=3 * 100)
+	@Scheduled(fixedRate = 3 * 10)
 	public void checkoutFakeOrder(){
 		IntStream.rangeClosed(1, _int(2, 12)).forEach(t -> {
 			Order order = picker.pick();
@@ -40,7 +43,7 @@ public class OrderCheckoutMock {
 		});
 	}
 	
-	@Scheduled(fixedRate=30 * 100)
+	@Scheduled(fixedRate = 30 * 10)
 	public void cancelFakeOrder(){
 		IntStream.range(1, _int(2, cancellantionQueue.size() > 2 ? cancellantionQueue.size() : 2)).forEach(t ->{
 			UUID orderUuid = cancellantionQueue.poll();

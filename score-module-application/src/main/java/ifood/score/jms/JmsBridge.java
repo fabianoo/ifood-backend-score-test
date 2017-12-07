@@ -3,6 +3,7 @@ package ifood.score.jms;
 import com.google.gson.Gson;
 import ifood.score.domain.entity.FailedJmsMessage;
 import ifood.score.domain.repository.FailedJmsMessageRepository;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Signal;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.UUID;
 
 @Component
@@ -21,6 +23,7 @@ public class JmsBridge {
     private static final Logger logger = LoggerFactory.getLogger(JmsBridge.class);
 
     @Autowired
+    @Getter
     private JmsTemplate jmsTemplate;
 
     @Autowired
@@ -49,10 +52,10 @@ public class JmsBridge {
             } catch (JmsException ex) {
                 logger.error("Failed to send JMS message. Caused by: " + ex.getMessage());
                 healthy = false;
-                fallBackToDatabase(destination, textMessage);
+                fallBackToDatabase(destination, textMessage, message.getClass());
             }
         } else {
-            fallBackToDatabase(destination, textMessage);
+            fallBackToDatabase(destination, textMessage, message.getClass());
         }
     }
 
@@ -61,16 +64,22 @@ public class JmsBridge {
     }
 
     private void sendFailedMessage(FailedJmsMessage message) {
-        this.sendMessage(message.getDestination(), message.getMessage());
-        failedJmsMessageRepository.delete(message);
+        try {
+            Object objMsg = new Gson().fromJson(message.getMessage(), Class.forName(message.getOriginalClass()));
+            this.sendMessage(message.getDestination(), objMsg);
+            failedJmsMessageRepository.delete(message);
+        } catch (ClassNotFoundException e) {
+            logger.error(e.getMessage());
+            throw new IllegalArgumentException("Could not recover message.", e);
+        }
     }
 
     private LocalDateTime aMinuteAgo() {
         return LocalDateTime.now().minusMinutes(1);
     }
 
-    private void fallBackToDatabase(String destination, String message) {
-        FailedJmsMessage failedMessage = new FailedJmsMessage(destination, message);
+    private void fallBackToDatabase(String destination, String message, Class clazz) {
+        FailedJmsMessage failedMessage = new FailedJmsMessage(destination, message, clazz.getCanonicalName());
         failedJmsMessageRepository.save(failedMessage);
     }
 }
