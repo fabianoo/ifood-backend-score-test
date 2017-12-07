@@ -43,4 +43,4 @@ application:
     - activemq
     - mongodb
   volumes:
-    - /container_data/webapp.log:/application.log
+    - /container_data/webapp:/logs
