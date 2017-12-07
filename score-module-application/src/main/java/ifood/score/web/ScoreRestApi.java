@@ -39,7 +39,7 @@ public class ScoreRestApi {
         return menuScoreRepository.findById(menu);
     }
 
-    @RequestMapping("/categories/scores")
+    @RequestMapping("/categories/score")
     public Flux<CategoryScore> categoriesScores(
             @RequestParam(value = "min-score", defaultValue = "0") BigDecimal minScore,
             @RequestParam(value = "max-score", defaultValue = "100") BigDecimal maxScore) {
@@ -47,7 +47,7 @@ public class ScoreRestApi {
         return categoryScoreRepository.findByMeanBetweenOrderByMeanAsc(minScore, maxScore);
     }
 
-    @RequestMapping("/menu/scores")
+    @RequestMapping("/menu/score")
     public Flux<MenuScore> menuScores(
             @RequestParam(value = "min-score", defaultValue = "0") BigDecimal minScore,
             @RequestParam(value = "max-score", defaultValue = "100") BigDecimal maxScore,
