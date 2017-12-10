@@ -30,9 +30,6 @@ public class ScoreBuilder {
     public <T extends Score> T build() throws ScoreBuildingException {
         validate();
 
-        BigDecimal sum = relevanceItems.stream().map(Relevance.Item::getValue).reduce((v, acc) -> acc = acc.add(v)).get();
-        BigDecimal scoreVal = MathOperations.divide(sum, relevanceItems.size());
-
         Score score;
         Category category = relevanceItems.get(0).getCategory();
         if(category != null) {
@@ -40,6 +37,10 @@ public class ScoreBuilder {
         } else {
             score = new MenuScore(relevanceItems.get(0).getMenuId());
         }
+
+        BigDecimal sum = relevanceItems.stream().map(Relevance.Item::getValue)
+                .reduce((v, acc) -> acc = acc.add(v)).get();
+        BigDecimal scoreVal = MathOperations.divide(sum, relevanceItems.size());
         score.setMean(scoreVal);
         score.setWeight(relevanceItems.size());
 

@@ -51,12 +51,13 @@ Even that this orthodox solutions were a very good choice, our problem is a simp
 
 This approach was tested as a POC and now runs processing up to 300 messages per seconds with one instance of the java application running with 1.5GB of heap memory in a single core processor.
 
+Every five minutes theres a rectifier that runs and recalculates the scores' values. This is needed because the high concurrency can cause some *race condition* situation in Mongo when calculating scores. This do not happen with *Relevance* entities because I create just one document per order and activated the transactional capability of Mongo (this is possible just for a single  document scenario). 
 
 ## What Could Be Better
 
 Due to other commitments and reasons beyond my control, the time window was really short these days. Accordingly, as always, there is a lot to improve. Down below, I list the 2 major improvements that I think are imperative:  
 
-- The application **MUST** have way more unit and integration tests (with embedded Mongo and ActiveMQ)
+- The application **MUST** have way more unit and integration tests (with embedded Mongo and ActiveMQ, as showed in the two examples inside the application test suite)
 - In order to scale horizontally with more efficiency, I should split the application by responsibility:
     * One for serving the rest API's
     * Another to process the data

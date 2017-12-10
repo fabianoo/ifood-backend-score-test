@@ -1,7 +1,6 @@
 package ifood.score.service;
 
 import ifood.score.domain.entity.Relevance;
-import ifood.score.domain.entity.RelevanceStatus;
 import ifood.score.domain.utils.MathOperations;
 import ifood.score.menu.Category;
 import ifood.score.order.Item;

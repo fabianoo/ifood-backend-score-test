@@ -14,4 +14,5 @@ public interface RelevanceRepository extends MongoRepository<Relevance, UUID> {
 
     List<Relevance> findByConfirmedAtBeforeAndStatus(Date confirmedUntil, RelevanceStatus status);
 
+    List<Relevance> findByStatus(RelevanceStatus status);
 }

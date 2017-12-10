@@ -5,9 +5,9 @@ import ifood.score.mock.generator.order.OrderPicker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.jms.config.JmsListenerEndpointRegistry;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
 import static ifood.score.mock.generator.RandomishPicker._int;
 
 @Component
-@Profile("!benchmarking")
+@Profile({"dev", "docker"})
 public class OrderCheckoutMock {
 
 	@Value("${score.order.checkout.queue-name}")
@@ -24,6 +24,9 @@ public class OrderCheckoutMock {
 
 	@Value("${score.order.cancel.queue-name}")
 	private String cancelOrderQueue;
+
+	@Autowired
+	private JmsListenerEndpointRegistry jmsListenerEndpointRegistry;
 
 	@Autowired
 	private JmsBridge jmsBridge;

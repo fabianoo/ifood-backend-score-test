@@ -1,39 +1,50 @@
-package ifood.score.order;
+package ifood.score.test.integration;
 
+import com.mongodb.MongoClient;
 import ifood.score.jms.JmsBridge;
 import ifood.score.mock.generator.order.OrderPicker;
+import ifood.score.order.Order;
+import ifood.score.service.ScoresRectifier;
+import ifood.score.test.integration.helper.RelevanceReduceChecker;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.IntStream;
 
-@Component
-@Profile("benchmarking")
-public class OrderCheckoutBenchmarking {
+import static ifood.score.domain.utils.MathOperations.asBigDecimal;
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderCheckoutBenchmarking.class);
-    private static final int CHECKOUT_MESSAGES = 1_0;
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+public class OrderCheckoutAccuracyTest {
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    private static final Logger logger = LoggerFactory.getLogger(OrderCheckoutAccuracyTest.class);
+
+    private static final int CHECKOUT_MESSAGES = 10_000;
 
     @Autowired
     private JmsBridge jmsBridge;
+
+    @Autowired
+    private MongoClient mongoClient;
+
+    @Autowired
+    private RelevanceReduceChecker checker;
 
     @Value("${score.order.checkout.queue-name}")
     private String checkoutOrderQueue;
@@ -41,12 +52,23 @@ public class OrderCheckoutBenchmarking {
     @Value("${score.order.cancel.queue-name}")
     private String cancelOrderQueue;
 
+    @Value("${spring.data.mongodb.database}")
+    private String database;
+
     private static OrderPicker picker = new OrderPicker();
 
     private Collection<UUID> cancellantionQueue = new ArrayList<>();
 
-    @Scheduled(fixedDelay = 60 * 1000L)
-    public void benchmark() throws InterruptedException {
+    @Autowired
+    private ScoresRectifier scoresRectifier;
+
+    @Before
+    public void before() {
+        mongoClient.dropDatabase(database);
+    }
+
+    @Test
+    public void testAccuracy() throws InterruptedException {
         DateTime start = DateTime.now();
 
         IntStream.range(1, CHECKOUT_MESSAGES).forEach(i -> {
@@ -81,10 +103,27 @@ public class OrderCheckoutBenchmarking {
         logger.info("Order Cancel Messages: " + CHECKOUT_MESSAGES / 10);
         logger.info("It took " + result +  " to process everything.");
 
-//        SpringApplication.exit(applicationContext, () -> 2);
+        scoresRectifier.rectify();
+
+        logger.info("Now, checking the results...");
+
+        List<BigDecimal> bigDecimals = checker.approximationIndexes();
+        long outOffAccuracyRange = bigDecimals.stream().peek(b -> logger.info(String.format("Index: %s", b)))
+                .filter(this::isInaccurate).count();
+
+        logger.info(String.format(
+                "There are a total %s of %s scores that are not accurate.", outOffAccuracyRange, bigDecimals.size()));
+
+        Assert.assertEquals(0L, outOffAccuracyRange);
     }
 
-    public Integer messageCount(String queueName) {
+    private Boolean isInaccurate(BigDecimal value) {
+        BigDecimal minIndex = asBigDecimal(1).subtract(asBigDecimal(0.01));
+        BigDecimal maxIndex = asBigDecimal(1).add(asBigDecimal(0.05));
+        return value.compareTo(minIndex) < 0 || value.compareTo(maxIndex) > 0;
+    }
+
+    private Integer messageCount(String queueName) {
         return jmsBridge.getJmsTemplate().browse(queueName,
                 (session, queueBrowser) -> Collections.list(queueBrowser.getEnumeration()).size());
     }

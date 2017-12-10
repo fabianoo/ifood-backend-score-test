@@ -47,7 +47,7 @@ public class JmsConfig {
 
     private RedeliveryPolicy redeliveryPolicy() {
         RedeliveryPolicy policy = new RedeliveryPolicy();
-        policy.setRedeliveryDelay(10 * 1000);
+        policy.setRedeliveryDelay(1000);
         policy.setUseExponentialBackOff(true);
         policy.setMaximumRedeliveries(15);
 

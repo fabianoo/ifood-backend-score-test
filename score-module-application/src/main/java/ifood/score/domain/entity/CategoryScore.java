@@ -5,13 +5,19 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigDecimal;
+
 @EqualsAndHashCode(callSuper = true)
 @Document
 @Data
 @ToString
 @NoArgsConstructor
-@AllArgsConstructor
 public class CategoryScore extends Score {
     @Id
     private Category category;
+
+    public CategoryScore(Category category) {
+        super();
+        this.category = category;
+    }
 }

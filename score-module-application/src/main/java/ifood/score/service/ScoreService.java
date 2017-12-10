@@ -28,6 +28,38 @@ public class ScoreService {
     @Autowired
     private RelevanceRepository relevanceRepository;
 
+    public void recalculateAllScores() {
+        List<Relevance> computedRelevances = relevanceRepository.findByStatus(RelevanceStatus.COMPUTED);
+
+        List<CategoryScore> categoryScores = calculateCategoryScores(computedRelevances);
+        categoryScoreRepository.saveAll(categoryScores);
+
+        List<MenuScore> menuScores = calculateMenuScores(computedRelevances);
+        menuScoreRepository.saveAll(menuScores);
+    }
+
+    private List<CategoryScore> calculateCategoryScores(List<Relevance> computedRelevances) {
+        Map<Category, List<Relevance.Item>> map = computedRelevances.stream()
+                .flatMap(r -> r.getItems().stream())
+                .filter(r -> r.getCategory() != null)
+                .collect(Collectors.groupingBy(Relevance.Item::getCategory));
+
+        return map.keySet().stream()
+                .map(c -> (CategoryScore) new ScoreBuilder().withItems(map.get(c)).build())
+                .collect(Collectors.toList());
+    }
+
+    private List<MenuScore> calculateMenuScores(List<Relevance> computedRelevances) {
+        Map<UUID, List<Relevance.Item>> map = computedRelevances.stream()
+                .flatMap(r -> r.getItems().stream())
+                .filter(r -> r.getMenuId() != null)
+                .collect(Collectors.groupingBy(Relevance.Item::getMenuId));
+
+        return map.keySet().stream()
+                .map(m -> (MenuScore) new ScoreBuilder().withItems(map.get(m)).build())
+                .collect(Collectors.toList());
+    }
+
     public void cancelRelevancesFromOrderId(String orderId) throws ScoreAsyncComputingException {
         Optional<Relevance> optional = relevanceRepository.findById(UUID.fromString(orderId));
 

@@ -47,17 +47,6 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
-		<!-- Test -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.projectreactor</groupId>
-			<artifactId>reactor-test</artifactId>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.sshd</groupId>
 			<artifactId>sshd-core</artifactId>
@@ -94,6 +83,24 @@
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongodb-driver-reactivestreams</artifactId>
 			<version>1.6.0</version>
+		</dependency>
+
+		<!-- Test -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId>
+			<version>2.0.0</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

@@ -11,9 +11,13 @@ import java.util.UUID;
 @Data
 @ToString
 @NoArgsConstructor
-@AllArgsConstructor
 public class MenuScore extends Score {
 
     @Id
     private UUID menuId;
+
+    public MenuScore(UUID menuId) {
+        super();
+        this.menuId = menuId;
+    }
 }

@@ -25,7 +25,9 @@ public class OrderConsumer {
     @Autowired
     private RelevanceRepository relevanceRepository;
 
-    @JmsListener(destination = "${score.order.checkout.queue-name}", concurrency = "1-200")
+    @JmsListener(id = "${score.order.checkout.queue-name}",
+            destination = "${score.order.checkout.queue-name}",
+            concurrency = "1-200")
     @Transactional
     public void receiveCheckoutOrderMessage(String message) {
         logger.debug("Receiving Checkout Order: " + message);
@@ -39,7 +41,9 @@ public class OrderConsumer {
         relevanceRepository.save(relevance);
     }
 
-    @JmsListener(destination = "${score.order.cancel.queue-name}", concurrency = "1-30")
+    @JmsListener(id = "${score.order.cancel.queue-name}",
+            destination = "${score.order.cancel.queue-name}",
+            concurrency = "1-30")
     public void receiveCancelOrderMessage(String uuid) {
         logger.debug("Receiving Cancel Order: " + uuid);
         scoreService.cancelRelevancesFromOrderId(uuid);

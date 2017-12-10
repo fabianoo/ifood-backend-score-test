@@ -9,10 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class RelevanceComputerTest {
 
@@ -32,7 +29,7 @@ public class RelevanceComputerTest {
         item.setMenuUnitPrice(MathOperations.asBigDecimal(50));
         item.setQuantity(2);
 
-        order.setItems(Arrays.asList(item));
+        order.setItems(Collections.singletonList(item));
 
         RelevanceComputer processor = new RelevanceComputer(order);
         Relevance relevance = processor.computeRelevance();

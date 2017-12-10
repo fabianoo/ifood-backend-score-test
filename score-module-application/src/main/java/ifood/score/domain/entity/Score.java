@@ -14,6 +14,11 @@ public abstract class Score {
 
     private Integer weight;
 
+    Score() {
+        this.mean = BigDecimal.ZERO;
+        this.weight = 0;
+    }
+
     public void compute(Relevance.Item item) {
         BigDecimal amount = amount();
         weight++;
